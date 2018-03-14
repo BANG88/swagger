@@ -1,0 +1,48 @@
+{
+  "name": "@merryjs/swagger",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/lodash": "^4.14.104",
+    "@types/node": "^9.4.7",
+    "@types/swagger-parser": "^4.0.2",
+    "ava": "^0.25.0",
+    "husky": "^0.14.3",
+    "prettier": "^1.11.1",
+    "pretty-quick": "^1.4.1",
+    "typescript": "^2.7.2"
+  },
+  "scripts": {
+    "precommit": "pretty-quick --staged",
+    "dev": "tsc -w",
+    "test": "tsc && ava"
+  },
+  "dependencies": {
+    "immutable": "^3.8.2",
+    "swagger-parser": "^4.0.2"
+  },
+  "ava": {
+    "files": ["tests/*.js"],
+    "concurrency": 5,
+    "failWithoutAssertions": false,
+    "tap": true,
+    "verbose": true
+  },
+  "description":
+    "> Lets say we want generate codes from swagger api. but the scheme's type is different with `JavaScript`. so we need convert it to `JavaScript` type",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bang88/swagger.git"
+  },
+  "keywords": ["swagger", "type", "to", "JavaScript"],
+  "author": "bang88",
+  "bugs": {
+    "url": "https://github.com/bang88/swagger/issues"
+  },
+  "homepage": "https://github.com/bang88/swagger#readme"
+}
