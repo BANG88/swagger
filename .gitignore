@@ -61,4 +61,4 @@ typings/
 .next
 *.d.ts
 *.js
-tests/json/
+tests/json/*.json
