@@ -1,4 +1,4 @@
-# Swagger
+# Swagger [![Build Status](https://travis-ci.org/bang88/swagger.svg?branch=master)](https://travis-ci.org/bang88/swagger)
 
 > Lets say we want generate codes from swagger api. but the scheme's type is different with `JavaScript`.
 > so we need convert it to `JavaScript` type
