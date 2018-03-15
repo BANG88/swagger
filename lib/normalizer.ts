@@ -1,13 +1,13 @@
 import { Operation, Spec } from 'swagger-schema-official'
 
-import { typeOfSchema, typeOfParameter } from './type'
+import { API, typeOfSchema, typeOfParameter } from './type'
 import parser from 'swagger-parser'
 
 /**
  * parse all types in schemas|parameters|responses
  * @param api
  */
-export const parse = async (api: string | Spec) => {
+export const parse = async (api: API) => {
   const res: Spec = await parser.dereference(api)
 
   for (const key in res.paths) {
@@ -49,3 +49,5 @@ export const parse = async (api: string | Spec) => {
   }
   return res
 }
+
+export const merge = () => {}

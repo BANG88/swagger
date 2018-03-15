@@ -5,7 +5,7 @@
  * and then you can use theses methods simply
  */
 
-import { Schema, Parameter, BodyParameter } from 'swagger-schema-official'
+import { Schema, Parameter, BodyParameter, Spec } from 'swagger-schema-official'
 
 /**
  * check current parameter is BodyParameter
@@ -90,3 +90,5 @@ export const formatType = (schema: Schema): string => {
 
   return 'any'
 }
+
+export type API = string | Spec

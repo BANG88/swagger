@@ -62,3 +62,4 @@ typings/
 *.d.ts
 *.js
 tests/json/*.json
+tests/json/*.ts
