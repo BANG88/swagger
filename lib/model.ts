@@ -81,7 +81,6 @@ const getDefinitions = (schema: Schema): string => {
  */
 export interface GenerateOptions {
   api: API
-  dist: string
 }
 
 /**
@@ -90,38 +89,31 @@ export interface GenerateOptions {
  */
 export const generateDefinitions = async (options: GenerateOptions) => {
   const res = await parse(options.api)
+  const definitions: {
+    [key: string]: string
+  } = {}
   if (res.definitions) {
     let defs = ''
-    for (const def in res.definitions) {
+    for (let def in res.definitions) {
       if (res.definitions.hasOwnProperty(def)) {
         const element = res.definitions[def]
         const ifs = getDefinitions(element)
+        def = changeCase.pascalCase(def)
         try {
           const config = (await prettier.resolveConfig(process.cwd())) || {}
           const result = prettier.format(
-            `${getComments(element)}export interface ${changeCase.pascalCase(
-              def
-            )} ${ifs}`,
+            `${getComments(element)}export interface ${def} ${ifs}`,
             {
               parser: 'typescript',
               ...config,
             }
           )
-          console.log(`handle file: %s`, changeCase.pascalCase(def), element)
-          fs.writeFile(
-            options.dist + `/${changeCase.pascalCase(def)}.ts`,
-            result,
-            'utf-8',
-            err => {
-              if (err) {
-                console.log(`err: %s`, err)
-              }
-            }
-          )
+          definitions[def] = result
         } catch (error) {
           console.log(`err: %s`, error)
         }
       }
     }
   }
+  return definitions
 }
