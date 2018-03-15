@@ -12,7 +12,7 @@ test('resolver', async t => {
       const element = result[key]
       console.log(`handle file: %s`, key)
       fs.writeFile(
-        __dirname + '/json/' + `/${key}.ts`,
+        __dirname + '/json' + `/${key}.ts`,
         element,
         'utf-8',
         err => {
@@ -32,7 +32,7 @@ test('generatePaths', async t => {
       const element = result[key]
       console.log(`handle file: %s`, key)
       fs.writeFile(
-        __dirname + '/json/' + `/${key}.ts`,
+        __dirname + '/json' + `/${key}.ts`,
         element,
         'utf-8',
         err => {
