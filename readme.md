@@ -3,6 +3,10 @@
 > Lets say we want generate codes from swagger api. but the scheme's type is different with `JavaScript`.
 > so we need convert it to `JavaScript` type
 
+_Note_:
+
+This is a WIP project. ☢
+
 _TODO_:
 
 * [x] convert schema type to `TypeScript` type
@@ -22,10 +26,5 @@ npm install @merryjs/swagger --save
 ## Usage
 
 ```ts
-import { parseAll } from '@merryjs/swagger'
-;(async function() {
-  const api = await parseAll('path/to/your/swagger.json')
-  // modified version.
-  console.log(api)
-})()
+// to be continue
 ```
