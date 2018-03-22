@@ -64,3 +64,5 @@ typings/
 tests/json/
 tsconfig.json
 .vscode
+tests/json/*.json
+tests/json/*.yml

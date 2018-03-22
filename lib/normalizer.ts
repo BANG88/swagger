@@ -49,5 +49,3 @@ export const parse = async (api: API) => {
   }
   return res
 }
-
-export const merge = () => {}
