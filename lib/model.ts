@@ -224,7 +224,7 @@ export const formatter = (
   if (parameter.required) {
     rules.push({
       required: true,
-      message: '请输入' + label,
+      message: label,
     })
   }
 
