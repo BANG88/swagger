@@ -8,7 +8,11 @@ import parser from 'swagger-parser'
  * @param api
  */
 export const parse = async (api: API) => {
-  const res: Spec = await parser.dereference(api)
+  const res: Spec = await parser.dereference(api, {
+    dereference: {
+      circular: 'ignore',
+    },
+  } as any)
 
   for (const key in res.paths) {
     if (res.paths.hasOwnProperty(key)) {

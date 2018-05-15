@@ -11,9 +11,9 @@ _TODO_:
 
 * [x] convert schema type to `TypeScript` type
 * [x] generate `TypeScript` type definitions from swagger definitions
-* [ ] generate a readable data format from swagger api that we can use it in handlebar templates easier
+* [x] generate a readable data format from swagger api that we can use it in handlebar templates easier
 * [ ] write a plugin for `@merryjs/cli` so we can generate `React` or `React Native` project
-* [ ] write a plugin for `@merryjs/cli` so we can generate console projects that using `Ant-Design` as UI framework
+* [x] write a plugin for `@merryjs/cli` so we can generate console projects that using `Ant-Design` as UI framework
 * [ ] write tests
 
 ## Installation
