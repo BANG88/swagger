@@ -4,14 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@types/lodash": "^4.14.108",
-    "@types/node": "^10.0.9",
-    "@types/prettier": "^1.12.2",
+    "@types/lodash": "^4.14.116",
+    "@types/node": "^10.11.0",
+    "@types/prettier": "^1.13.2",
     "@types/swagger-parser": "^4.0.2",
     "ava": "^0.25.0",
-    "husky": "^0.14.3",
-    "pretty-quick": "^1.4.1",
-    "typescript": "^2.8.3"
+    "husky": "^1.0.0",
+    "pretty-quick": "^1.7.0",
+    "typescript": "^3.0.3"
   },
   "scripts": {
     "precommit": "pretty-quick --staged",
@@ -20,18 +20,19 @@
   },
   "dependencies": {
     "change-case": "^3.0.2",
-    "prettier": "^1.12.1",
-    "swagger-parser": "^4.1.0"
+    "prettier": "^1.14.3",
+    "swagger-parser": "^5.0.5"
   },
   "ava": {
-    "files": ["tests/*.js"],
+    "files": [
+      "tests/*.js"
+    ],
     "concurrency": 5,
     "failWithoutAssertions": false,
     "tap": true,
     "verbose": true
   },
-  "description":
-    "> Lets say we want generate codes from swagger api. but the scheme's type is different with `JavaScript`. so we need convert it to `JavaScript` type",
+  "description": "> Lets say we want generate codes from swagger api. but the scheme's type is different with `JavaScript`. so we need convert it to `JavaScript` type",
   "directories": {
     "lib": "lib",
     "test": "tests"
@@ -40,7 +41,12 @@
     "type": "git",
     "url": "git+https://github.com/bang88/swagger.git"
   },
-  "keywords": ["swagger", "type", "to", "JavaScript"],
+  "keywords": [
+    "swagger",
+    "type",
+    "to",
+    "JavaScript"
+  ],
   "author": "bang88",
   "bugs": {
     "url": "https://github.com/bang88/swagger/issues"
