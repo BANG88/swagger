@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@types/fs-extra": "^5.0.4",
     "@types/lodash": "^4.14.116",
     "@types/node": "^10.11.0",
     "@types/prettier": "^1.13.2",
@@ -20,6 +21,7 @@
   },
   "dependencies": {
     "change-case": "^3.0.2",
+    "fs-extra": "^7.0.0",
     "prettier": "^1.14.3",
     "swagger-parser": "^5.0.5"
   },

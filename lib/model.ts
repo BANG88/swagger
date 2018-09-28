@@ -121,7 +121,7 @@ const toInterface = async (element: Schema, def: string) => {
   let result = ''
   try {
     const contents =
-      element.type === 'array'
+      element.type === element.enum || element.type === 'array'
         ? `${getComments(element)}export type ${def} = ${ifs}`
         : `${getComments(element)}export interface ${def} ${ifs}`
 
@@ -153,10 +153,13 @@ export const generateDefinitions = async (options: GenerateOptions) => {
   return definitions
 }
 // TODO
-export const generatePaths = async (api: API) => {
+export const generatePaths = async (
+  api: API,
+  options?: GenerateByPathOptions
+) => {
   const res = await parse(api)
   const results: {
-    [key: string]: string
+    [key: string]: GenerateResults
   } = {}
   if (!res.paths) {
     return results
@@ -164,7 +167,8 @@ export const generatePaths = async (api: API) => {
   // paths
   for (const path in res.paths) {
     if (res.paths.hasOwnProperty(path)) {
-      await generateByPath(path, res.paths[path])
+      const resultsArr = await generateByPath(path, res.paths[path], options)
+      results[path] = resultsArr
     }
   }
   return results
@@ -241,22 +245,72 @@ export const formatter = (
     rulesRaw: JSON.stringify(rules, null, 2),
   }
 }
+export interface GenerateByPathOptions {
+  /**
+   * '{path}{operationId}'
+   */
+  definitionName: string
+}
+export type GenerateResults = Array<{
+  responses: string
+  parameters: string
+  path: string
+  summary?: string
+}>
 /**
  * generate interface and form by path
  * @param path
  */
-export const generateByPath = async (path: string, element: Path) => {
+export const generateByPath = async (
+  path: string,
+  element: Path,
+  options: GenerateByPathOptions = {
+    definitionName: '{path}{operationId}',
+  }
+) => {
+  const results: GenerateResults = []
   // verb
   for (const op in element) {
     if (element.hasOwnProperty(op)) {
       const operation: Operation = (element as any)[op]
+
+      const isGet = op === 'get'
+      const isPut = op === 'put'
+      const isPost = op === 'post'
+      const isDelete = op === 'delete'
+      const isOptions = op === 'options'
+      const isHead = op === 'head'
+      const isPatch = op === 'patch'
+      const actions = {
+        isGet,
+        isPut,
+        isPost,
+        isDelete,
+        isOptions,
+        isHead,
+        isPatch,
+      }
       const result: {
         responses: string
-        parameters: object
-      } = {
+        parameters: string
+        // operation: Operation
+        path: string
+        summary?: string
+      } & typeof actions = {
         responses: '',
-        parameters: {},
+        parameters: '',
+        // operation,
+        ...actions,
+        path,
+        summary: operation.summary,
       }
+
+      const baseDefinitionName = changeCase.pascalCase(
+        options.definitionName
+          .replace('{path}', path)
+          .replace('{operationId}', operation.operationId || '')
+      )
+
       // responses
       for (const response in operation.responses) {
         if (operation.responses.hasOwnProperty(response)) {
@@ -266,26 +320,42 @@ export const generateByPath = async (path: string, element: Path) => {
               (response === '200' && res.schema.type === 'object') ||
               res.schema.type === 'array'
             ) {
-              const def = changeCase.pascalCase(path + operation.operationId)
-              result.responses = await toInterface(res.schema, def)
+              result.responses = await toInterface(
+                res.schema,
+                `${baseDefinitionName}Entity`
+              )
             }
           }
         }
       }
       if (operation.parameters) {
-        for (const parameter in operation.parameters) {
-          if (operation.parameters.hasOwnProperty(parameter)) {
-            const element = operation.parameters[parameter]
-            const def = changeCase.pascalCase(path + operation.operationId)
-            if (isBodyParameter(element) && element.schema) {
-              const ts = await toInterface(element.schema, def)
-              console.log(ts)
-            }
-          }
-        }
+        const def = `${baseDefinitionName}Params`
+        const types = await format(
+          `${getComments(operation)}export interface ${def} {\n${getInterface(
+            operation.parameters
+          )}\n}`
+        )
+        result.parameters = types
+        // for (const parameter in operation.parameters) {
+        //   if (operation.parameters.hasOwnProperty(parameter)) {
+        //     const element = operation.parameters[parameter]
+        // 		const def = changeCase.pascalCase(path + operation.operationId)
+        // 		let ifs = ''
+        //     if (isBodyParameter(element) && element.schema) {
+        //       ifs = await toInterface(element.schema, def)
+        //     }else{
+
+        // 			console.log('ele: ',  await toInterface(element as any, def))
+        // 		}
+        // 		result.parameters = ifs
+        //   }
+        // }
       }
+
+      results.push(result)
     }
   }
+  return results
 }
 
 export const getInterface = (parameters?: Parameter[]) => {
