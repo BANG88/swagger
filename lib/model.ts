@@ -84,12 +84,12 @@ const getSchemaDefinitions = (schema: Schema): string => {
       return res + '}'
     case 'array':
       if (Array.isArray(schema.items)) {
-        return (
-          schema.items.map(item => getSchemaDefinitions(item)).join(',') + '[]'
-        )
+        return `Array<${schema.items
+          .map(item => getSchemaDefinitions(item))
+          .join(',')}>`
       }
       if (schema.items) {
-        return getSchemaDefinitions(schema.items) + '[]'
+        return `Array<${getSchemaDefinitions(schema.items)}>`
       }
       return 'any[]'
 
@@ -196,10 +196,10 @@ export const defaultFormatter: FormatterOptions = {
 }
 export interface FormatResult {
   label: string
-  rules: {
+  rules: Array<{
     message: string
     required: boolean
-  }[]
+  }>
   name: string
   type: string
   rulesRaw: string
