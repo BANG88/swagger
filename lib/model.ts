@@ -251,12 +251,16 @@ export interface GenerateByPathOptions {
    */
   definitionName: string
 }
-export type GenerateResults = Array<{
+export interface GenerateResult {
   responses: string
   parameters: string
   path: string
   summary?: string
-}>
+  definitionEntityName?: string
+  definitionParamsName?: string
+  operation: string
+}
+export type GenerateResults = Array<GenerateResult>
 /**
  * generate interface and form by path
  * @param path
@@ -290,18 +294,15 @@ export const generateByPath = async (
         isHead,
         isPatch,
       }
-      const result: {
-        responses: string
-        parameters: string
-        // operation: Operation
-        path: string
-        summary?: string
-      } & typeof actions = {
+      const operations = path.split('/')
+      const operationStr = operations[operations.length - 1]
+      const result: GenerateResult & typeof actions = {
         responses: '',
         parameters: '',
         // operation,
         ...actions,
         path,
+        operation: operationStr,
         summary: operation.summary,
       }
 
@@ -320,6 +321,7 @@ export const generateByPath = async (
               (response === '200' && res.schema.type === 'object') ||
               res.schema.type === 'array'
             ) {
+              result.definitionEntityName = `${baseDefinitionName}Entity`
               result.responses = await toInterface(
                 res.schema,
                 `${baseDefinitionName}Entity`
@@ -330,6 +332,7 @@ export const generateByPath = async (
       }
       if (operation.parameters) {
         const def = `${baseDefinitionName}Params`
+        result.definitionParamsName = `${baseDefinitionName}Params`
         const types = await format(
           `${getComments(operation)}export interface ${def} {\n${getInterface(
             operation.parameters
