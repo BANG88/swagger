@@ -41,9 +41,11 @@ const getComments = (schema: Schema) => {
  */
 const isRequired = (schema: Schema | Parameter, key: string) => {
   const required =
-    typeof schema.required === 'boolean'
-      ? schema.required
-      : schema.required && schema.required.includes(key)
+    schema.required === undefined
+      ? true
+      : typeof schema.required === 'boolean'
+        ? schema.required
+        : schema.required && schema.required.includes(key)
   return required ? '' : '?'
 }
 /**
