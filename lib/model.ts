@@ -62,12 +62,18 @@ const getEnumType = (schema: Schema) => {
     })
     .join('|')
 }
-
+export interface SchemaDefinitionsRoot {
+  [key: string]: string
+}
 /**
  * get definitions by scheme
  * @param schema
  */
-const getSchemaDefinitions = (schema: Schema): string => {
+const getSchemaDefinitions = (
+  schema: Schema,
+  root?: SchemaDefinitionsRoot,
+  key: string = ''
+): string => {
   switch (schema.type) {
     case 'object':
       let res = `{`
@@ -79,19 +85,29 @@ const getSchemaDefinitions = (schema: Schema): string => {
             res += `${getComments(prop)}${key}${isRequired(
               schema,
               key
-            )}: ${getSchemaDefinitions(prop)}\n`
+            )}: ${getSchemaDefinitions(prop, root, key)}\n`
           }
         }
       }
       return res + '}'
     case 'array':
       if (Array.isArray(schema.items)) {
-        return `Array<${schema.items
-          .map(item => getSchemaDefinitions(item))
-          .join(',')}>`
+        const d = schema.items
+          .map(item => getSchemaDefinitions(item, root))
+          .join(',')
+        if (key && root) {
+          root[key] = `export interface ${key}=${d}`
+          return `${key}[]`
+        }
+        return 'Array<' + d + '>'
       }
       if (schema.items) {
-        return `Array<${getSchemaDefinitions(schema.items)}>`
+        const d = getSchemaDefinitions(schema.items, root)
+        if (key && root) {
+          root[key] = `export interface ${key} ${d}`
+          return `${key}[]`
+        }
+        return 'Array<' + d + '>'
       }
       return 'any[]'
 
@@ -119,15 +135,22 @@ export interface GenerateOptions {
   api: API
 }
 const toInterface = async (element: Schema, def: string) => {
-  const ifs = getSchemaDefinitions(element)
+  const ifsResults: SchemaDefinitionsRoot = {}
+  const ifs = getSchemaDefinitions(element, ifsResults)
   let result = ''
   try {
     const contents =
       element.type === element.enum || element.type === 'array'
         ? `${getComments(element)}export type ${def} = ${ifs}`
         : `${getComments(element)}export interface ${def} ${ifs}`
-
-    result = await format(contents)
+    let preDefined = '\n'
+    for (const key in ifsResults) {
+      if (ifsResults.hasOwnProperty(key)) {
+        const element = ifsResults[key]
+        preDefined += element + '\n'
+      }
+    }
+    result = await format(preDefined + contents)
   } catch (error) {
     console.log(`err: %s`, error)
   }
