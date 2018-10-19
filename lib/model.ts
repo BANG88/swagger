@@ -136,7 +136,7 @@ export interface GenerateOptions {
 }
 const toInterface = async (element: Schema, def: string) => {
   const ifsResults: SchemaDefinitionsRoot = {}
-  const ifs = getSchemaDefinitions(element, ifsResults)
+  const ifs = getSchemaDefinitions(element, ifsResults, def + 'Item')
   let result = ''
   try {
     const contents =
