@@ -104,6 +104,12 @@ const getSchemaDefinitions = (
       if (schema.items) {
         const d = getSchemaDefinitions(schema.items, root)
         if (key && root) {
+          if (
+            schema.items.type === 'number' ||
+            schema.items.type === 'string'
+          ) {
+            return schema.items.type + '[]'
+          }
           root[key] = `export interface ${key} ${d}`
           return `${key}[]`
         }
