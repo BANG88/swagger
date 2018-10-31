@@ -396,6 +396,13 @@ export const getInterface = (parameters?: Parameter[]) => {
   if (!parameters) {
     return ''
   }
+  // fix: dot net post request has a parameter doest not work
+  // parameters : { user: { id: 1 } } =>  parameters: { id: 1}
+  if (parameters.length === 1 && isBodyParameter(parameters[0])) {
+    return getParameterDefinitions(parameters[0])
+      .replace(/^{/, '')
+      .replace(/}$/, '')
+  }
   return parameters
     .map(p => {
       return `${getComments(p as any)}${p.name}${isRequired(
