@@ -183,7 +183,11 @@ export const generateDefinitions = async (options: GenerateOptions) => {
   }
   return definitions
 }
-// TODO
+/**
+ * Generate by paths
+ * @param api
+ * @param options
+ */
 export const generatePaths = async (
   api: API,
   options?: GenerateByPathOptions
@@ -290,6 +294,7 @@ export interface GenerateResult {
   definitionEntityName?: string
   definitionParamsName?: string
   operation: string
+  isArrayEntity: boolean
 }
 export type GenerateResults = Array<GenerateResult>
 /**
@@ -327,6 +332,12 @@ export const generateByPath = async (
       }
       const operations = path.split('/')
       const operationStr = operations[operations.length - 1]
+      const successRes = operation.responses['200']
+      const isArrayEntity = !!(
+        successRes &&
+        successRes.schema &&
+        successRes.schema.type === 'array'
+      )
       const result: GenerateResult & typeof actions = {
         responses: '',
         parameters: '',
@@ -335,6 +346,7 @@ export const generateByPath = async (
         path,
         operation: operationStr,
         summary: operation.summary,
+        isArrayEntity,
       }
 
       const baseDefinitionName = changeCase.pascalCase(
