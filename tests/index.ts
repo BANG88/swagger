@@ -2,7 +2,7 @@
 import test from 'ava'
 import { Spec, Operation } from 'swagger-schema-official'
 
-import fs from 'fs'
+import fs from 'fs-extra'
 import { parse } from '../index'
 
 test('local json file', async t => {
@@ -10,7 +10,7 @@ test('local json file', async t => {
   t.is(res.info.version, 'v1')
   t.is(res.info.title, 'AGCO API')
   fs.writeFileSync(
-    __dirname + '/json/swagger.json.json',
+    __dirname + '/json/swagger.json',
     JSON.stringify(res, null, 2),
     'utf-8'
   )
@@ -32,9 +32,7 @@ test('remote file', async t => {
     'https://api.apis.guru/v2/specs/adafruit.com/2.0.0/swagger.json'
   )
   t.is(res.info.title, 'Adafruit IO')
-  fs.writeFileSync(
-    __dirname + '/json/adafruit.json',
-    JSON.stringify(res, null, 2),
-    'utf-8'
-  )
+  const dist = __dirname + '/json/adafruit.json'
+  fs.ensureFileSync(dist)
+  fs.writeFileSync(dist, JSON.stringify(res, null, 2), 'utf-8')
 })

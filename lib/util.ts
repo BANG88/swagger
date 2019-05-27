@@ -8,3 +8,23 @@ export const format = async (contents: string, options: Options = {}) => {
   })
   return result
 }
+
+export const getActionsByOperation = (op: string) => {
+  const isGet = op === 'get'
+  const isPut = op === 'put'
+  const isPost = op === 'post'
+  const isDelete = op === 'delete'
+  const isOptions = op === 'options'
+  const isHead = op === 'head'
+  const isPatch = op === 'patch'
+  const actions = {
+    isGet,
+    isPut,
+    isPost,
+    isDelete,
+    isOptions,
+    isHead,
+    isPatch,
+  }
+  return actions
+}

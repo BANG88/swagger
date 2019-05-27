@@ -10,7 +10,7 @@ import parser from 'swagger-parser'
 export const parse = async (api: API) => {
   const res: Spec = await parser.dereference(api, {
     dereference: {
-      circular: 'ignore',
+      circular: true,
     },
   } as any)
 

@@ -18,8 +18,7 @@ import { API, isBodyParameter } from './type'
 import fs from 'fs'
 import prettier from 'prettier'
 import changeCase from 'change-case'
-import { format } from './util'
-
+import { format, getActionsByOperation } from './util'
 /**
  * get comments from schema
  * @param schema
@@ -285,6 +284,10 @@ export interface GenerateByPathOptions {
    * '{path}{operationId}'
    */
   definitionName: string
+  /**
+   * Generate json schema too.
+   */
+  schema?: boolean
 }
 export interface GenerateResult {
   responses: string
@@ -314,22 +317,7 @@ export const generateByPath = async (
     if (element.hasOwnProperty(op)) {
       const operation: Operation = (element as any)[op]
 
-      const isGet = op === 'get'
-      const isPut = op === 'put'
-      const isPost = op === 'post'
-      const isDelete = op === 'delete'
-      const isOptions = op === 'options'
-      const isHead = op === 'head'
-      const isPatch = op === 'patch'
-      const actions = {
-        isGet,
-        isPut,
-        isPost,
-        isDelete,
-        isOptions,
-        isHead,
-        isPatch,
-      }
+      const actions = getActionsByOperation(op)
       const operations = path.split('/')
       const operationStr = operations[operations.length - 1]
       const successRes = operation.responses['200']
@@ -365,10 +353,21 @@ export const generateByPath = async (
               res.schema.type === 'array'
             ) {
               result.definitionEntityName = `${baseDefinitionName}Entity`
-              result.responses = await toInterface(
-                res.schema,
-                `${baseDefinitionName}Entity`
-              )
+
+              if (options.schema) {
+                const json = {
+                  ...res.schema,
+                  id: operationStr,
+                  $schema: 'http://json-schema.org/draft-06/schema#',
+                  description: result.summary,
+                }
+                result.responses = JSON.stringify(json)
+              } else {
+                result.responses = await toInterface(
+                  res.schema,
+                  `${baseDefinitionName}Entity`
+                )
+              }
             }
           }
         }
@@ -376,12 +375,26 @@ export const generateByPath = async (
       if (operation.parameters) {
         const def = `${baseDefinitionName}Params`
         result.definitionParamsName = `${baseDefinitionName}Params`
-        const types = await format(
-          `${getComments(operation)}export interface ${def} {\n${getInterface(
-            operation.parameters
-          )}\n}`
-        )
-        result.parameters = types
+        if (options.schema) {
+          const j: any = {}
+          operation.parameters.forEach(p => {
+            j[p.name] = p
+          })
+          const json = {
+            id: operationStr,
+            $schema: 'http://json-schema.org/draft-06/schema#',
+            description: result.summary,
+            properties: j,
+          }
+          result.parameters = JSON.stringify(json)
+        } else {
+          const types = await format(
+            `${getComments(operation)}export interface ${def} {\n${getInterface(
+              operation.parameters
+            )}\n}`
+          )
+          result.parameters = types
+        }
         // for (const parameter in operation.parameters) {
         //   if (operation.parameters.hasOwnProperty(parameter)) {
         //     const element = operation.parameters[parameter]
