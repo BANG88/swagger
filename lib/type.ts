@@ -14,7 +14,7 @@ import { Schema, Parameter, BodyParameter, Spec } from 'swagger-schema-official'
 export const isBodyParameter = (
   parameter: Parameter
 ): parameter is BodyParameter => {
-  return (<BodyParameter>parameter).schema !== undefined
+  return (<BodyParameter>parameter).schema !== undefined && (<BodyParameter>parameter).in !== 'query'
 }
 
 /**
