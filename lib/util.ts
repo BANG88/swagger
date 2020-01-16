@@ -25,6 +25,7 @@ export const getActionsByOperation = (op: string) => {
     isOptions,
     isHead,
     isPatch,
+    httpVerb: op,
   }
   return actions
 }
