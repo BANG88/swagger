@@ -19,6 +19,7 @@ import fs from 'fs'
 import prettier from 'prettier'
 import changeCase from 'change-case'
 import { format, getActionsByOperation } from './util'
+import { quicktypeJSONSchema } from './quicktype'
 /**
  * get comments from schema
  * @param schema
@@ -352,22 +353,38 @@ export const generateByPath = async (
               (response === '200' && res.schema.type === 'object') ||
               res.schema.type === 'array'
             ) {
-              result.definitionEntityName = `${baseDefinitionName}Entity`
-
-              if (options.schema) {
-                const json = {
-                  ...res.schema,
-                  id: operationStr,
-                  $schema: 'http://json-schema.org/draft-06/schema#',
-                  description: result.summary,
-                }
-                result.responses = JSON.stringify(json)
-              } else {
-                result.responses = await toInterface(
-                  res.schema,
-                  `${baseDefinitionName}Entity`
-                )
+              result.definitionEntityName = `${baseDefinitionName}Entity`.replace(
+                'Api',
+                'API'
+              )
+              const json = {
+                ...res.schema,
+                id: operationStr,
+                $schema: 'http://json-schema.org/draft-06/schema#',
+                description: result.summary,
               }
+
+              result.responses = (await quicktypeJSONSchema({
+                typeName: result.definitionEntityName,
+                jsonSchemaString: json,
+              })).lines
+                .join('\n')
+                .replace(/\?\:/gi, ':')
+
+              // if (options.schema) {
+              //   const json = {
+              //     ...res.schema,
+              //     id: operationStr,
+              //     $schema: 'http://json-schema.org/draft-06/schema#',
+              //     description: result.summary,
+              //   }
+              //   result.responses = JSON.stringify(json)
+              // } else {
+              //   result.responses = await toInterface(
+              //     res.schema,
+              //     `${baseDefinitionName}Entity`
+              //   )
+              // }
             }
           }
         }
@@ -375,6 +392,17 @@ export const generateByPath = async (
       if (operation.parameters) {
         const def = `${baseDefinitionName}Params`
         result.definitionParamsName = `${baseDefinitionName}Params`
+        // const json = {
+        //   ...res.schema,
+        //   id: operationStr,
+        //   $schema: 'http://json-schema.org/draft-06/schema#',
+        //   description: result.summary,
+        // }
+
+        // result.responses = (await quicktypeJSONSchema({
+        //   typeName: result.definitionEntityName,
+        //   jsonSchemaString: json,
+        // })).lines.join('\n')
         if (options.schema) {
           const j: any = {}
           operation.parameters.forEach(p => {
@@ -395,20 +423,6 @@ export const generateByPath = async (
           )
           result.parameters = types
         }
-        // for (const parameter in operation.parameters) {
-        //   if (operation.parameters.hasOwnProperty(parameter)) {
-        //     const element = operation.parameters[parameter]
-        // 		const def = changeCase.pascalCase(path + operation.operationId)
-        // 		let ifs = ''
-        //     if (isBodyParameter(element) && element.schema) {
-        //       ifs = await toInterface(element.schema, def)
-        //     }else{
-
-        // 			console.log('ele: ',  await toInterface(element as any, def))
-        // 		}
-        // 		result.parameters = ifs
-        //   }
-        // }
       }
 
       results.push(result)

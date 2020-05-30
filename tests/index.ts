@@ -1,38 +1,41 @@
 // https://api.apis.guru/v2/list.json
 import test from 'ava'
-import { Spec, Operation } from 'swagger-schema-official'
-
 import fs from 'fs-extra'
-import { parse } from '../index'
-
-test('local json file', async t => {
-  const res: Spec = await parse(__dirname + '/swagger.json')
-  t.is(res.info.version, 'v1')
-  t.is(res.info.title, 'AGCO API')
-  fs.writeFileSync(
-    __dirname + '/json/swagger.json',
-    JSON.stringify(res, null, 2),
-    'utf-8'
-  )
+import { generateDefinitions, generatePaths } from '../index'
+import { quicktypeJSONSchema } from '../lib/quicktype'
+test('quicktype', async t => {
+  const jsonSchemaString = {
+    $schema: 'http://json-schema.org/draft-06/schema#',
+    description: 'result.summary',
+  }
+  const { lines } = await quicktypeJSONSchema({
+    typeName: 'TEST',
+    jsonSchemaString: jsonSchemaString,
+  })
+  fs.writeFile(__dirname + '/json/test.ts', lines.join('\n'), 'utf-8', err => {
+    if (err) {
+      console.log(`err: %s`, err)
+    }
+  })
 })
-
-test('local yaml file', async t => {
-  const res: Spec = await parse(__dirname + '/swagger.yml')
-  t.is(res.info.version, '1.0.0')
-  t.is(res.info.title, 'Swagger Petstore')
-  fs.writeFileSync(
-    __dirname + '/json/swagger.yml.json',
-    JSON.stringify(res, null, 2),
-    'utf-8'
-  )
-})
-
-test('remote file', async t => {
-  const res: Spec = await parse(
-    'https://api.apis.guru/v2/specs/adafruit.com/2.0.0/swagger.json'
-  )
-  t.is(res.info.title, 'Adafruit IO')
-  const dist = __dirname + '/json/adafruit.json'
-  fs.ensureFileSync(dist)
-  fs.writeFileSync(dist, JSON.stringify(res, null, 2), 'utf-8')
+test('resolver', async t => {
+  const result = await generateDefinitions({
+    api: __dirname + '/swagger.yml',
+  })
+  for (const key in result) {
+    if (result.hasOwnProperty(key)) {
+      const element = result[key]
+      console.log(`handle file: %s`, key)
+      fs.writeFile(
+        __dirname + '/json' + `/${key}.ts`,
+        element,
+        'utf-8',
+        err => {
+          if (err) {
+            console.log(`err: %s`, err)
+          }
+        }
+      )
+    }
+  }
 })
