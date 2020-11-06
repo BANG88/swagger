@@ -370,6 +370,19 @@ export const generateByPath = async (
               })).lines
                 .join('\n')
                 .replace(/\?\:/gi, ':')
+              if (json.type === 'array') {
+                // fixes root array not typed
+                // https://github.com/quicktype/quicktype/issues/1309
+                result.responses = result.responses.replace(
+                  `export interface ${result.definitionEntityName}`,
+                  `
+                export type ${
+                  result.definitionEntityName
+                } = ${baseDefinitionName}Entities[]
+                export interface ${baseDefinitionName}Entities
+                `
+                )
+              }
 
               // if (options.schema) {
               //   const json = {
