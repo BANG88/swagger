@@ -33,6 +33,7 @@ export async function quicktypeJSONSchema({
       'runtime-typecheck': false,
       'date-times': false,
       'nice-property-names': false,
+      'acronym-style': 'original',
     },
   })
 }
