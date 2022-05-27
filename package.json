@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "change-case": "^3.0.2",
-    "fs-extra": "^7.0.0",
+    "fs-extra": "^8.0.0",
     "prettier": "^1.14.3",
     "quicktype-core": "^6.0.60",
     "swagger-parser": "^6.0.5"
